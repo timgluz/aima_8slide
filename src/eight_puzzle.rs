@@ -1,11 +1,10 @@
 use crate::actions::Action;
 use crate::search::SearchProblem;
-use std::fmt;
 
 const MIN_STATE_INDEX: usize = 0;
 const MAX_STATE_INDEX: usize = 8;
 
-type PuzzleStateRow = [u8;9];
+type PuzzleStateRow = [u8; 9];
 const DEFAULT_GOAL: [u8; 9] = [1, 2, 3, 4, 5, 6, 7, 8, 0];
 
 struct Tile {
@@ -49,7 +48,7 @@ impl Tile {
             Action::Up => self.can_go_up(),
             Action::Down => self.can_go_down(),
             Action::Left => self.can_go_left(),
-            Action::Right => self.can_go_right()
+            Action::Right => self.can_go_right(),
         }
     }
 
@@ -79,7 +78,7 @@ impl Tile {
 }
 
 pub struct EightPuzzleState {
-    value: PuzzleStateRow
+    value: PuzzleStateRow,
 }
 
 impl EightPuzzleState {
@@ -133,21 +132,21 @@ impl EightPuzzleState {
 
 pub struct EightPuzzle {
     state: EightPuzzleState,
-    goal: EightPuzzleState
+    goal: EightPuzzleState,
 }
 
 impl EightPuzzle {
     pub fn new(initial_state: EightPuzzleState) -> Self {
         EightPuzzle {
             state: initial_state,
-            goal : EightPuzzleState::new(DEFAULT_GOAL),
+            goal: EightPuzzleState::new(DEFAULT_GOAL),
         }
     }
 
     pub fn from_row(state_row: PuzzleStateRow) -> Self {
         EightPuzzle {
             state: EightPuzzleState::new(state_row),
-            goal: EightPuzzleState::new(DEFAULT_GOAL)
+            goal: EightPuzzleState::new(DEFAULT_GOAL),
         }
     }
 
@@ -159,7 +158,8 @@ impl EightPuzzle {
     // here it is the number of misplaces tiles
     fn h(&self) -> u8 {
         // TODO:
-        self.state().value()
+        self.state()
+            .value()
             .iter()
             .zip(self.goal.value().iter())
             .map(|(s, g)| if s != g { 1 } else { 0 })
@@ -305,14 +305,19 @@ mod tests {
 
     #[test]
     fn test_possible_actions_from_6() {
-        assert_eq!(vec![Action::Up, Action::Right], Tile::new(6).possible_actions());
+        assert_eq!(
+            vec![Action::Up, Action::Right],
+            Tile::new(6).possible_actions()
+        );
     }
 
     #[test]
     fn test_possible_actions_from_8() {
-        assert_eq!(vec![Action::Up, Action::Left], Tile::new(8).possible_actions());
+        assert_eq!(
+            vec![Action::Up, Action::Left],
+            Tile::new(8).possible_actions()
+        );
     }
-
 
     #[test]
     fn test_init_new_puzzle() {

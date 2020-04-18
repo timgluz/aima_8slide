@@ -26,7 +26,7 @@ pub struct SearchNode {
     action: Option<Action>,
     item: Rc<Box<dyn SearchProblem>>,
     depth: usize,
-    path_cost: u32
+    path_cost: u32,
 }
 
 impl SearchNode {
@@ -36,7 +36,7 @@ impl SearchNode {
             action: None,
             item: Rc::new(problem),
             depth: 0,
-            path_cost: 0
+            path_cost: 0,
         }
     }
 
@@ -48,9 +48,10 @@ impl SearchNode {
             action: Some(action),
             item: Rc::new(new_problem),
             depth: parent.depth() + 1,
-            path_cost: 1u32
+            path_cost: 1u32,
         }
     }
+
     pub fn expand(&self) -> Vec<SearchNode> {
         let mut next_nodes = vec![];
 
@@ -75,7 +76,7 @@ impl SearchNode {
 
     pub fn solution(&self) -> Vec<Option<Action>> {
         // TODO: finish
-        self.path().iter().rev().map(|node| None ).collect()
+        self.path().iter().rev().map(|node| None).collect()
     }
 
     pub fn path(&self) -> Vec<Weak<SearchNode>> {
