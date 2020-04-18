@@ -71,6 +71,9 @@ mod tests {
         fn as_string(&self) -> String {
             "test_problem".to_string()
         }
+        fn hash_code(&self) -> u64 {
+            0
+        }
     }
 
     #[test]

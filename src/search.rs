@@ -1,4 +1,6 @@
+use std::collections::hash_map::DefaultHasher;
 use std::fmt;
+use std::hash::{Hash, Hasher};
 use std::rc::{Rc, Weak};
 
 use crate::actions::Action;
@@ -10,6 +12,7 @@ pub trait SearchProblem {
     fn path_cost(&self) -> u32;
     fn value(&self) -> u32;
     fn as_string(&self) -> String;
+    fn hash_code(&self) -> u64; // used for comparition
 }
 
 impl fmt::Debug for SearchProblem {
@@ -92,6 +95,9 @@ impl SearchNode {
 
 impl PartialEq for SearchNode {
     fn eq(&self, other: &Self) -> bool {
-        self.item().as_string() == other.item().as_string()
+        let self_item_hash = self.item().hash_code();
+        let other_item_hash = other.item().hash_code();
+
+        self_item_hash == other_item_hash
     }
 }

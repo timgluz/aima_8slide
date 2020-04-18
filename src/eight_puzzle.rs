@@ -1,3 +1,6 @@
+use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
+
 use crate::actions::Action;
 use crate::search::SearchProblem;
 
@@ -190,6 +193,19 @@ impl SearchProblem for EightPuzzle {
 
     fn as_string(&self) -> String {
         format!("EightPuzzle(state: ${:?}", self.state.value())
+    }
+
+    fn hash_code(&self) -> u64 {
+        let mut hasher = DefaultHasher::new();
+
+        self.hash(&mut hasher);
+        hasher.finish()
+    }
+}
+
+impl Hash for EightPuzzle {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.state().value().hash(state);
     }
 }
 
