@@ -1,6 +1,5 @@
 use std::fmt;
 use std::rc::{Rc, Weak};
-use std::borrow::Borrow;
 
 use crate::actions::Action; // TODO: how to abstract it away?? and have something in search.rs instead
 pub mod frontiers;
@@ -16,7 +15,7 @@ pub trait SearchProblem {
     fn hash_code(&self) -> u64; // used for comparition
 }
 
-impl fmt::Debug for SearchProblem {
+impl fmt::Debug for dyn SearchProblem {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("SearchProblem")
             .field("state", &self.as_string())
