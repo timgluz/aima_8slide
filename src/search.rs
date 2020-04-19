@@ -4,7 +4,7 @@ use std::borrow::Borrow;
 
 use crate::actions::Action; // TODO: how to abstract it away?? and have something in search.rs instead
 pub mod frontiers;
-pub mod strategies;
+pub mod uniform;
 
 pub trait SearchProblem {
     fn actions(&self) -> Vec<Action>;

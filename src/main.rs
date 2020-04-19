@@ -2,7 +2,7 @@ mod actions;
 mod eight_puzzle;
 mod search;
 
-use search::strategies::depth_first_tree_search;
+use search::uniform::depth_first_tree_search;
 
 fn solve_eight_puzzle(test_row: [u8;9]) {
     let initial_state = eight_puzzle::EightPuzzleState::new(test_row);
