@@ -1,9 +1,10 @@
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum Action {
     Up,
     Down,
     Left,
     Right,
+    None
 }
 
 impl Action {
@@ -17,6 +18,7 @@ impl Action {
             Action::Down => 3,
             Action::Left => -1,
             Action::Right => 1,
+            Action::None => 0
         }
     }
 }
@@ -24,5 +26,4 @@ impl Action {
 #[cfg(test)]
 mod tests {
     use super::*;
-
 }

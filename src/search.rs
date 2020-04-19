@@ -1,9 +1,8 @@
-use std::collections::hash_map::DefaultHasher;
 use std::fmt;
-use std::hash::{Hash, Hasher};
 use std::rc::{Rc, Weak};
 
 use crate::actions::Action;
+use std::borrow::Borrow;
 
 pub trait SearchProblem {
     fn actions(&self) -> Vec<Action>;
@@ -18,14 +17,14 @@ pub trait SearchProblem {
 impl fmt::Debug for SearchProblem {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("SearchProblem")
-            .field("state:", &self.as_string())
+            .field("state", &self.as_string())
             .finish()
     }
 }
 
 #[derive(Clone)]
 pub struct SearchNode {
-    parent: Option<Weak<SearchNode>>,
+    parent: Option<Rc<SearchNode>>,
     action: Option<Action>,
     item: Rc<Box<dyn SearchProblem>>,
     depth: usize,
@@ -47,7 +46,7 @@ impl SearchNode {
         let new_problem = parent.item().result(&action);
 
         SearchNode {
-            parent: Some(Rc::downgrade(parent)),
+            parent: Some(parent.clone()),
             action: Some(action),
             item: Rc::new(new_problem),
             depth: parent.depth() + 1,
@@ -77,18 +76,26 @@ impl SearchNode {
         self.depth
     }
 
-    pub fn solution(&self) -> Vec<Option<Action>> {
-        // TODO: finish
-        self.path().iter().rev().map(|node| None).collect()
+    pub fn solution(&self) -> Vec<Action> {
+        self.path().iter()
+            .rev()
+            .map(|node| node.action().unwrap_or(Action::None))
+            .collect()
     }
 
-    pub fn path(&self) -> Vec<Weak<SearchNode>> {
-        let mut path = vec![];
+    pub fn path(&self) -> Vec<Rc<SearchNode>> {
+        let mut path = vec![Rc::new(self.clone())];
+        let mut cur_parent = self.parent.clone();
 
-        if let Some(next_parent) = self.parent.clone() {
-            path.push(next_parent);
+        loop {
+            match cur_parent {
+                None => break,
+                Some(parent) => {
+                    path.push(parent.clone());
+                    cur_parent = parent.parent.clone();
+                }
+            }
         }
-        //TODO: finish
         path
     }
 }

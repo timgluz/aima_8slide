@@ -52,6 +52,7 @@ impl Tile {
             Action::Down => self.can_go_down(),
             Action::Left => self.can_go_left(),
             Action::Right => self.can_go_right(),
+            Action::None => true
         }
     }
 
@@ -111,11 +112,13 @@ impl EightPuzzleState {
         EightPuzzleState::new(new_value)
     }
 
-    fn find_blank_square(&self) -> usize {
-        self.value().iter().position(|&x| x == 0).unwrap()
-    }
-
-    fn is_solveable(&self) -> bool {
+    ///  is_solveable() checks inversions.
+    ///  Given a board, an inversion is any pair of tiles i and j where i < j
+    ///  but i appears after j when considering the board in row-major order
+    ///  (row 0, followed by row 1, and so forth).
+    ///  source:
+    ///  https://www.cs.princeton.edu/courses/archive/spring18/cos226/assignments/8puzzle/index.html
+    pub fn is_solveable(&self) -> bool {
         let mut inversion = 0;
 
         let state = self.value();
@@ -130,6 +133,10 @@ impl EightPuzzleState {
         }
 
         inversion % 2 == 0
+    }
+
+    fn find_blank_square(&self) -> usize {
+        self.value().iter().position(|&x| x == 0).unwrap()
     }
 }
 
@@ -192,7 +199,7 @@ impl SearchProblem for EightPuzzle {
     }
 
     fn as_string(&self) -> String {
-        format!("EightPuzzle(state: ${:?}", self.state.value())
+        format!("EightPuzzle(state: {:?}", self.state.value())
     }
 
     fn hash_code(&self) -> u64 {
@@ -412,6 +419,13 @@ mod tests {
         let puzzle = EightPuzzleState::new([1, 2, 3, 4, 0, 5, 6, 7, 8]);
 
         assert!(puzzle.is_solveable());
+    }
+
+    #[test]
+    fn eight_puzzle_check_solvability_with_unsolvable_state() {
+        let puzzle = EightPuzzleState::new([7, 0, 2, 8, 5, 3, 6, 4, 1]);
+
+        assert!(!puzzle.is_solveable())
     }
 
     #[test]
