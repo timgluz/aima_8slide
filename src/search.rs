@@ -1,8 +1,10 @@
 use std::fmt;
 use std::rc::{Rc, Weak};
-
-use crate::actions::Action;
 use std::borrow::Borrow;
+
+use crate::actions::Action; // TODO: how to abstract it away?? and have something in search.rs instead
+pub mod frontiers;
+pub mod strategies;
 
 pub trait SearchProblem {
     fn actions(&self) -> Vec<Action>;
