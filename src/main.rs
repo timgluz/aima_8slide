@@ -2,8 +2,7 @@ mod actions;
 mod eight_puzzle;
 mod search;
 
-use search::uniform::depth_first_tree_search;
-use crate::search::uniform::breadth_first_tree_search;
+use search::uniform::{depth_first_search, breadth_first_search};
 
 fn solve_eight_puzzle(test_row: [u8;9]) {
     let initial_state = eight_puzzle::EightPuzzleState::new(test_row);
@@ -13,8 +12,8 @@ fn solve_eight_puzzle(test_row: [u8;9]) {
     }
 
     let puzzle = Box::new(eight_puzzle::EightPuzzle::new(initial_state));
-    let solver = |puzzle| { depth_first_tree_search(puzzle) };
-    let solver2 = |puzzle| { breadth_first_tree_search(puzzle) };
+    let solver = |puzzle| { depth_first_search(puzzle) };
+    let solver2 = |puzzle| { breadth_first_search(puzzle) };
 
     match  solver2(puzzle) {
         None => println!("no solution for {:?}", test_row),

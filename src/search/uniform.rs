@@ -8,7 +8,7 @@ use crate::search::frontiers::{Frontier, StackFrontier, QueueFrontier};
 
 /// depth_first_tree_search
 /// it follows first path until it hits wall, then backs up and check other branches;
-pub fn depth_first_tree_search(problem: Box<dyn SearchProblem>) -> Option<SearchNode> {
+pub fn depth_first_search(problem: Box<dyn SearchProblem>) -> Option<SearchNode> {
     let root_node = SearchNode::root(problem);
     let mut frontier = StackFrontier::new();
     let mut explored: Vec<SearchNode> = vec![];
@@ -41,7 +41,7 @@ pub fn depth_first_tree_search(problem: Box<dyn SearchProblem>) -> Option<Search
 
 /// Search the shallowest nodes in the search tree first.
 /// Search through the successors of a problem to find a goal.
-pub fn breadth_first_tree_search(problem: Box<dyn SearchProblem>) -> Option<SearchNode> {
+pub fn breadth_first_search(problem: Box<dyn SearchProblem>) -> Option<SearchNode> {
     let root_node = SearchNode::root(problem);
     let mut frontier = QueueFrontier::new();
     let mut explored: Vec<SearchNode> = vec![];
