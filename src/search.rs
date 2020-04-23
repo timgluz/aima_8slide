@@ -1,5 +1,6 @@
+use std::cmp::Ordering;
 use std::fmt;
-use std::rc::{Rc, Weak};
+use std::rc::Rc;
 
 use crate::actions::Action; // TODO: how to abstract it away?? and have something in search.rs instead
 pub mod frontiers;
@@ -78,7 +79,8 @@ impl SearchNode {
     }
 
     pub fn solution(&self) -> Vec<Action> {
-        self.path().iter()
+        self.path()
+            .iter()
             .rev()
             .map(|node| node.action().unwrap_or(Action::None))
             .collect()
@@ -101,11 +103,24 @@ impl SearchNode {
     }
 }
 
+impl Eq for SearchNode {}
+
 impl PartialEq for SearchNode {
     fn eq(&self, other: &Self) -> bool {
-        let self_item_hash = self.item().hash_code();
-        let other_item_hash = other.item().hash_code();
+        self.depth == other.depth
+            && self.path_cost == other.path_cost
+            && self.item().hash_code() == other.item().hash_code()
+    }
+}
 
-        self_item_hash == other_item_hash
+impl Ord for SearchNode {
+    fn cmp(&self, other: &SearchNode) -> Ordering {
+        other.path_cost.cmp(&self.path_cost) // notice reverse ordering - it makes by default minHeap
+    }
+}
+
+impl PartialOrd for SearchNode {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
     }
 }

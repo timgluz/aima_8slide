@@ -1,4 +1,5 @@
 use crate::search::SearchNode;
+use std::collections::BinaryHeap;
 use std::collections::VecDeque;
 
 pub trait Frontier {
@@ -39,19 +40,64 @@ impl Frontier for StackFrontier {
 
 /// it works like pipe - first thing that go in, will come out first
 pub struct QueueFrontier {
-    collection: VecDeque<SearchNode>
+    collection: VecDeque<SearchNode>,
 }
 
 impl QueueFrontier {
-    pub fn new() -> Self { QueueFrontier { collection: VecDeque::new() } }
+    pub fn new() -> Self {
+        QueueFrontier {
+            collection: VecDeque::new(),
+        }
+    }
 }
 
 impl Frontier for QueueFrontier {
-    fn add(&mut self, node: SearchNode) { self.collection.push_back(node); }
-    fn remove(&mut self) -> Option<SearchNode> { self.collection.pop_front() }
-    fn is_empty(&self) -> bool { self.collection.is_empty() }
-    fn contains(&self, other: &SearchNode) -> bool { self.collection.contains(other) }
-    fn len(&self) -> usize { self.collection.len() }
+    fn add(&mut self, node: SearchNode) {
+        self.collection.push_back(node);
+    }
+    fn remove(&mut self) -> Option<SearchNode> {
+        self.collection.pop_front()
+    }
+    fn is_empty(&self) -> bool {
+        self.collection.is_empty()
+    }
+    fn contains(&self, other: &SearchNode) -> bool {
+        self.collection.contains(other)
+    }
+    fn len(&self) -> usize {
+        self.collection.len()
+    }
+}
+
+/// PriorityFrontier takes best node first
+pub struct PriorityFrontier {
+    collection: BinaryHeap<SearchNode>, // relies default impl of Ord
+}
+
+impl PriorityFrontier {
+    pub fn new() -> Self {
+        PriorityFrontier {
+            collection: BinaryHeap::new(),
+        }
+    }
+}
+
+impl Frontier for PriorityFrontier {
+    fn add(&mut self, node: SearchNode) {
+        self.collection.push(node);
+    }
+    fn remove(&mut self) -> Option<SearchNode> {
+        self.collection.pop()
+    }
+    fn is_empty(&self) -> bool {
+        self.collection.is_empty()
+    }
+    fn contains(&self, other: &SearchNode) -> bool {
+        self.collection.iter().find(|&n| n.eq(other)).is_some()
+    }
+    fn len(&self) -> usize {
+        self.collection.len()
+    }
 }
 
 #[cfg(test)]
@@ -83,11 +129,16 @@ mod tests {
             self.item
         }
         fn as_string(&self) -> String {
-            "test_problem".to_string()
+            "test_node".to_string()
         }
         fn hash_code(&self) -> u64 {
             0
         }
+    }
+
+    fn make_test_node(item_val: u32) -> SearchNode {
+        let test_node = Box::new(TestSearchProblem { item: item_val });
+        SearchNode::root(test_node)
     }
 
     #[test]
@@ -98,31 +149,29 @@ mod tests {
     #[test]
     fn test_stack_frontier_adds_new_item() {
         let mut frontier = StackFrontier::new();
-        let test_problem = Box::new(TestSearchProblem { item: 0 });
+        let test_node = make_test_node(0);
 
         assert!(frontier.is_empty());
-        frontier.add(SearchNode::root(test_problem));
+        frontier.add(test_node);
         assert!(!frontier.is_empty());
     }
 
     #[test]
     fn test_stack_frontier_contains_returns_false_when_empty() {
         let frontier = StackFrontier::new();
-        let test_problem = Box::new(TestSearchProblem { item: 1 });
-        let marker_node = SearchNode::root(test_problem);
+        let test_node = make_test_node(1);
 
-        assert_eq!(false, frontier.contains(&marker_node));
+        assert_eq!(false, frontier.contains(&test_node));
     }
 
     #[test]
     fn test_stack_frontier_contains_returns_true_if_element_exists() {
         let mut frontier = StackFrontier::new();
-        let test_problem = Box::new(TestSearchProblem { item: 1 });
-        let marker_node = SearchNode::root(test_problem);
+        let test_node = make_test_node(2);
 
-        frontier.add(marker_node.clone());
+        frontier.add(test_node.clone());
 
-        assert!(frontier.contains(&marker_node));
+        assert!(frontier.contains(&test_node));
     }
 
     #[test]
@@ -135,10 +184,9 @@ mod tests {
     #[test]
     fn test_stack_frontier_remove_if_frontier_has_item() {
         let mut frontier = StackFrontier::new();
-        let test_problem = Box::new(TestSearchProblem { item: 1 });
-        let marker_node = SearchNode::root(test_problem);
+        let test_node = make_test_node(1);
 
-        frontier.add(marker_node.clone());
+        frontier.add(test_node.clone());
 
         assert!(frontier.remove().is_some());
     }
@@ -146,35 +194,35 @@ mod tests {
     // QueueFrontier
 
     #[test]
-    fn test_queue_frontier_creates_new_empty_frontier() { assert!(QueueFrontier::new().is_empty()) }
+    fn test_queue_frontier_creates_new_empty_frontier() {
+        assert!(QueueFrontier::new().is_empty())
+    }
 
     #[test]
     fn test_queue_frontier_adds_new_item() {
         let mut frontier = QueueFrontier::new();
-        let test_problem = Box::new(TestSearchProblem { item: 0});
+        let test_node = make_test_node(0);
 
         assert!(frontier.is_empty());
-        frontier.add(SearchNode::root(test_problem));
+        frontier.add(test_node);
         assert!(!frontier.is_empty());
     }
 
     #[test]
     fn test_queue_frontier_contains_false_when_empty() {
         let frontier = QueueFrontier::new();
-        let test_problem = Box::new(TestSearchProblem { item: 2} );
-        let marker_node = SearchNode::root(test_problem);
+        let test_node = make_test_node(2);
 
-        assert_eq!(false, frontier.contains(&marker_node));
+        assert_eq!(false, frontier.contains(&test_node));
     }
 
     #[test]
     fn test_queue_frontier_contains_true_if_element_exists() {
         let mut frontier = QueueFrontier::new();
-        let test_problem = Box::new(TestSearchProblem { item: 3});
-        let marker_node = SearchNode::root(test_problem);
+        let test_node = make_test_node(3);
 
-        frontier.add(marker_node.clone());
-        assert!(frontier.contains(&marker_node));
+        frontier.add(test_node.clone());
+        assert!(frontier.contains(&test_node));
     }
 
     #[test]
@@ -187,17 +235,11 @@ mod tests {
     #[test]
     fn test_queue_frontier_remove_if_frontier_has_item() {
         let mut frontier = QueueFrontier::new();
-        let test_problem = Box::new(TestSearchProblem {item: 4});
-        let marker_node = SearchNode::root(test_problem);
+        let test_node = make_test_node(4);
 
-        frontier.add(marker_node.clone());
+        frontier.add(test_node.clone());
 
         assert!(frontier.remove().is_some());
-    }
-
-    fn make_test_node(item_val: u32) -> SearchNode {
-        let test_problem = Box::new(TestSearchProblem {item: item_val});
-        SearchNode::root(test_problem)
     }
 
     #[test]
@@ -211,5 +253,55 @@ mod tests {
 
         assert_eq!(5, frontier.remove().unwrap().item().value());
         assert_eq!(6, frontier.remove().unwrap().item().value());
+    }
+
+    //TODO  tests for priotiryFrontier
+
+    #[test]
+    fn test_priority_queue_create_new_empty_frontier() {
+        assert!(PriorityFrontier::new().is_empty());
+    }
+
+    #[test]
+    fn test_priority_queue_add_new_item() {
+        let mut frontier = PriorityFrontier::new();
+        let test_node = make_test_node(7);
+
+        assert!(frontier.is_empty());
+        frontier.add(test_node);
+        assert!(!frontier.is_empty());
+    }
+
+    #[test]
+    fn test_priority_queue_contains_false_when_empty() {
+        let frontier = PriorityFrontier::new();
+        let test_node = make_test_node(8);
+
+        assert_eq!(false, frontier.contains(&test_node));
+    }
+
+    #[test]
+    fn test_priority_contains_true_if_element_exists() {
+        let mut frontier = PriorityFrontier::new();
+        let test_node = make_test_node(9);
+
+        frontier.add(test_node.clone());
+        assert!(frontier.contains(&test_node));
+    }
+
+    #[test]
+    fn test_priority_remove_if_frontier_is_empty() {
+        let mut frontier = PriorityFrontier::new();
+
+        assert!(frontier.remove().is_none());
+    }
+
+    #[test]
+    fn test_priority_remove_if_frontier_has_item() {
+        let mut frontier = PriorityFrontier::new();
+        let test_node = make_test_node(10);
+
+        frontier.add(test_node.clone());
+        assert!(frontier.remove().is_some());
     }
 }

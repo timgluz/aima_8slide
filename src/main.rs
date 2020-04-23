@@ -25,6 +25,8 @@ fn solve_eight_puzzle(test_row: [u8;9]) {
     };
 }
 
+// TODO: read Puzzle from CLI
+// TODO: read algo from CLI
 fn main() {
     let test_row = [1, 2, 3, 4, 0, 5, 7, 8, 6]; // 2-steps
     //let test_row = [1, 2, 3, 7, 4, 5, 0, 8, 6];
