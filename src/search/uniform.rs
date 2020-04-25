@@ -39,27 +39,9 @@ pub fn depth_first_search(problem: Box<dyn SearchProblem>) -> Option<SearchNode>
 pub fn breadth_first_search(problem: Box<dyn SearchProblem>) -> Option<SearchNode> {
     let root_node = SearchNode::root(problem);
     let mut frontier = QueueFrontier::new();
-    let mut explored: Vec<SearchNode> = vec![];
 
     frontier.add(root_node);
-    while let Some(current_node) = frontier.remove() {
-        debug_search_node(&current_node);
-
-        if current_node.item().test_goal() {
-            return Some(current_node.clone());
-        }
-
-        let child_nodes = current_node.expand();
-        explored.push(current_node);
-
-        for child_node in child_nodes.into_iter() {
-            if !explored.contains(&child_node) {
-                frontier.add(child_node)
-            }
-        }
-    }
-
-    None
+    traverse_from_root(&mut frontier)
 }
 
 /// search the node by expanding the node n with the lowest path cost g(n).
@@ -91,6 +73,29 @@ pub fn uniform_cost_search(problem: Box<dyn SearchProblem>) -> Option<SearchNode
             // build a new node, which was bigger effort than just adding new element
             if !explored.contains(&child_node) {
                 frontier.add(child_node);
+            }
+        }
+    }
+
+    None
+}
+
+fn traverse_from_root(frontier: &mut impl Frontier) -> Option<SearchNode> {
+    let mut explored: Vec<SearchNode> = vec![];
+
+    while let Some(current_node) = frontier.remove() {
+        debug_search_node(&current_node);
+
+        if current_node.item().test_goal() {
+            return Some(current_node.clone());
+        }
+
+        let child_nodes = current_node.expand();
+        explored.push(current_node);
+
+        for child_node in child_nodes.into_iter() {
+            if !explored.contains(&child_node) {
+                frontier.add(child_node)
             }
         }
     }
