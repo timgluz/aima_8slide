@@ -10,6 +10,7 @@ pub trait SearchProblem {
     fn actions(&self) -> Vec<Action>;
     fn result(&self, action: &Action) -> Box<dyn SearchProblem>;
     fn test_goal(&self) -> bool;
+    // returns cost of solution from previous solution applying an Action A;
     fn path_cost(&self) -> u32;
     fn value(&self) -> u32;
     fn as_string(&self) -> String;
@@ -46,13 +47,14 @@ impl SearchNode {
 
     pub fn child_node(parent: &Rc<SearchNode>, action: Action) -> SearchNode {
         let new_problem = parent.item().result(&action);
+        let new_path_cost = parent.item().path_cost() + new_problem.path_cost();
 
         SearchNode {
             parent: Some(parent.clone()),
             action: Some(action),
             item: Rc::new(new_problem),
             depth: parent.depth() + 1,
-            path_cost: 1u32,
+            path_cost: new_path_cost,
         }
     }
 

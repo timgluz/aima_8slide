@@ -52,7 +52,7 @@ impl Tile {
             Action::Down => self.can_go_down(),
             Action::Left => self.can_go_left(),
             Action::Right => self.can_go_right(),
-            Action::None => true
+            Action::None => true,
         }
     }
 
@@ -191,9 +191,11 @@ impl SearchProblem for EightPuzzle {
         self.state.value() == self.goal.value()
     }
 
+    // path cost of 8slide is depth plus one move from the depth
     fn path_cost(&self) -> u32 {
         1
     }
+
     fn value(&self) -> u32 {
         0
     }
