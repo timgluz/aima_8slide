@@ -39,5 +39,5 @@ fn solve_eight_puzzle(test_row: [u8; 9], algorithm: SearchAlgorithm) {
 fn main() {
     let test_row = [1, 2, 3, 4, 0, 5, 7, 8, 6]; // 2-steps
                                                 //let test_row = [1, 2, 3, 7, 4, 5, 0, 8, 6];
-    solve_eight_puzzle(test_row, SearchAlgorithm::BreadthFirst);
+    solve_eight_puzzle(test_row, SearchAlgorithm::DepthFirst);
 }
