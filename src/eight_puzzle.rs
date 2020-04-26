@@ -4,11 +4,13 @@ use std::hash::{Hash, Hasher};
 use crate::actions::Action;
 use crate::search::SearchProblem;
 
+pub const PUZZLE_SIZE: usize = 9;
+
 const MIN_STATE_INDEX: usize = 0;
 const MAX_STATE_INDEX: usize = 8;
 
-type PuzzleStateRow = [u8; 9];
-const DEFAULT_GOAL: [u8; 9] = [1, 2, 3, 4, 5, 6, 7, 8, 0];
+pub type PuzzleStateRow = [u8; 9];
+pub const DEFAULT_GOAL: [u8; 9] = [1, 2, 3, 4, 5, 6, 7, 8, 0];
 
 struct Tile {
     index: usize,
