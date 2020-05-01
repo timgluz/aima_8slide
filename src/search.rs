@@ -2,7 +2,6 @@ use std::cmp::Ordering;
 use std::fmt;
 use std::rc::Rc;
 
-use crate::actions::Action; // TODO: how to abstract it away?? and have something in search.rs instead
 pub mod frontiers;
 pub mod uninformed;
 
@@ -22,6 +21,15 @@ impl fmt::Debug for dyn SearchProblem {
         f.debug_struct("SearchProblem")
             .field("state", &self.as_string())
             .finish()
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub struct Action(pub usize);
+
+impl Action {
+    pub fn none() -> Self {
+        Self(0)
     }
 }
 
@@ -84,7 +92,7 @@ impl SearchNode {
         self.path()
             .iter()
             .rev()
-            .map(|node| node.action().unwrap_or(Action::None))
+            .map(|node| node.action().unwrap_or(Action::none()))
             .collect()
     }
 

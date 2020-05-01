@@ -103,8 +103,7 @@ impl Frontier for PriorityFrontier {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::actions::Action;
-    use crate::search::SearchProblem;
+    use crate::search::{Action, SearchProblem};
 
     struct TestSearchProblem {
         item: u32,

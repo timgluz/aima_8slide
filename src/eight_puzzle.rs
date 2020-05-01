@@ -1,8 +1,7 @@
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
-use crate::actions::Action;
-use crate::search::SearchProblem;
+use crate::search::{Action, SearchProblem};
 
 pub const PUZZLE_SIZE: usize = 9;
 
@@ -11,6 +10,45 @@ const MAX_STATE_INDEX: usize = 8;
 
 pub type PuzzleStateRow = [u8; 9];
 pub const DEFAULT_GOAL: [u8; 9] = [1, 2, 3, 4, 5, 6, 7, 8, 0];
+
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub enum TileDirection {
+    None,
+    Up,
+    Down,
+    Left,
+    Right,
+}
+
+impl TileDirection {
+    pub fn delta(&self) -> i8 {
+        match self {
+            TileDirection::Up => -3,
+            TileDirection::Down => 3,
+            TileDirection::Left => -1,
+            TileDirection::Right => 1,
+            TileDirection::None => 0,
+        }
+    }
+}
+
+impl Into<Action> for TileDirection {
+    fn into(self) -> Action {
+        Action(self as usize)
+    }
+}
+
+impl From<&Action> for TileDirection {
+    fn from(action: &Action) -> Self {
+        match action.0 {
+            1 => TileDirection::Up,
+            2 => TileDirection::Down,
+            3 => TileDirection::Left,
+            4 => TileDirection::Right,
+            _ => TileDirection::None,
+        }
+    }
+}
 
 struct Tile {
     index: usize,
@@ -22,39 +60,39 @@ impl Tile {
 
         Tile { index }
     }
-    pub fn possible_actions(&self) -> Vec<Action> {
+    pub fn possible_actions(&self) -> Vec<TileDirection> {
         let mut actions = Vec::with_capacity(4);
         if self.can_go_up() {
-            actions.push(Action::Up)
+            actions.push(TileDirection::Up)
         }
         if self.can_go_down() {
-            actions.push(Action::Down)
+            actions.push(TileDirection::Down)
         }
         if self.can_go_left() {
-            actions.push(Action::Left)
+            actions.push(TileDirection::Left)
         }
         if self.can_go_right() {
-            actions.push(Action::Right)
+            actions.push(TileDirection::Right)
         }
 
         actions.shrink_to_fit();
         actions
     }
 
-    pub fn neighbor(&self, action: &Action) -> Tile {
+    pub fn neighbor(&self, action: &TileDirection) -> Tile {
         self.is_allowed_action(action);
 
         let neighbor: i8 = (self.index as i8) + action.delta();
         Tile::new(neighbor as usize)
     }
 
-    fn check_action(&self, action: &Action) -> bool {
+    fn check_action(&self, action: &TileDirection) -> bool {
         match action {
-            Action::Up => self.can_go_up(),
-            Action::Down => self.can_go_down(),
-            Action::Left => self.can_go_left(),
-            Action::Right => self.can_go_right(),
-            Action::None => true,
+            TileDirection::Up => self.can_go_up(),
+            TileDirection::Down => self.can_go_down(),
+            TileDirection::Left => self.can_go_left(),
+            TileDirection::Right => self.can_go_right(),
+            TileDirection::None => true,
         }
     }
 
@@ -62,7 +100,7 @@ impl Tile {
         assert!(index >= MIN_STATE_INDEX && index <= MAX_STATE_INDEX);
     }
 
-    fn is_allowed_action(&self, action: &Action) {
+    fn is_allowed_action(&self, action: &TileDirection) {
         assert!(self.check_action(action));
     }
 
@@ -95,13 +133,13 @@ impl EightPuzzleState {
     pub fn value(&self) -> &PuzzleStateRow {
         &self.value
     }
-    pub fn possible_actions(&self) -> Vec<Action> {
+    pub fn possible_actions(&self) -> Vec<TileDirection> {
         let blank_squared_index = self.find_blank_square();
 
         Tile::new(blank_squared_index).possible_actions()
     }
 
-    pub fn next_state(&self, action: &Action) -> Self {
+    pub fn next_state(&self, action: &TileDirection) -> Self {
         let blank_squared_index = self.find_blank_square();
         let blank_square = Tile::new(blank_squared_index);
         assert!(blank_square.check_action(action));
@@ -181,11 +219,16 @@ impl EightPuzzle {
 
 impl SearchProblem for EightPuzzle {
     fn actions(&self) -> Vec<Action> {
-        self.state().possible_actions()
+        self.state()
+            .possible_actions()
+            .iter()
+            .map(|&direction| direction.into())
+            .collect()
     }
 
     fn result(&self, action: &Action) -> Box<dyn SearchProblem> {
-        let solution = EightPuzzle::new(self.state.next_state(action));
+        let direction = TileDirection::from(action);
+        let solution = EightPuzzle::new(self.state.next_state(&direction));
         Box::new(solution)
     }
 
@@ -311,13 +354,20 @@ mod tests {
     fn test_possible_actions_from_0() {
         let blank = Tile::new(0);
 
-        assert_eq!(vec![Action::Down, Action::Right], blank.possible_actions());
+        assert_eq!(
+            vec![TileDirection::Down, TileDirection::Right],
+            blank.possible_actions()
+        );
     }
 
     #[test]
     fn test_possible_actions_from_1() {
         assert_eq!(
-            vec![Action::Down, Action::Left, Action::Right],
+            vec![
+                TileDirection::Down,
+                TileDirection::Left,
+                TileDirection::Right
+            ],
             Tile::new(1).possible_actions()
         )
     }
@@ -325,7 +375,7 @@ mod tests {
     #[test]
     fn test_possible_actions_from_2() {
         assert_eq!(
-            vec![Action::Down, Action::Left],
+            vec![TileDirection::Down, TileDirection::Left],
             Tile::new(2).possible_actions()
         )
     }
@@ -333,7 +383,7 @@ mod tests {
     #[test]
     fn test_possible_actions_from_6() {
         assert_eq!(
-            vec![Action::Up, Action::Right],
+            vec![TileDirection::Up, TileDirection::Right],
             Tile::new(6).possible_actions()
         );
     }
@@ -341,7 +391,7 @@ mod tests {
     #[test]
     fn test_possible_actions_from_8() {
         assert_eq!(
-            vec![Action::Up, Action::Left],
+            vec![TileDirection::Up, TileDirection::Left],
             Tile::new(8).possible_actions()
         );
     }
@@ -377,15 +427,18 @@ mod tests {
     #[test]
     fn test_eight_puzzle_actions_from_default_goal() {
         let puzzle = EightPuzzle::from_row(DEFAULT_GOAL);
+        let up_action: Action = TileDirection::Up.into();
+        let left_action: Action = TileDirection::Left.into();
 
-        assert_eq!(vec![Action::Up, Action::Left], puzzle.actions())
+        assert_eq!(vec![up_action, left_action], puzzle.actions())
     }
 
     #[test]
     fn test_eight_puzzle_result_with_valid_action() {
         let puzzle = EightPuzzle::from_row(DEFAULT_GOAL);
+        let action: Action = TileDirection::Up.into();
 
-        let res = puzzle.result(&Action::Up);
+        let res = puzzle.result(&action);
         assert_eq!(0, res.value());
     }
 
@@ -393,8 +446,9 @@ mod tests {
     #[should_panic]
     fn test_eight_puzzle_result_with_invalid_action() {
         let puzzle = EightPuzzle::from_row(DEFAULT_GOAL);
+        let action: Action = TileDirection::Down.into();
 
-        puzzle.result(&Action::Down);
+        puzzle.result(&action);
     }
 
     #[test]
