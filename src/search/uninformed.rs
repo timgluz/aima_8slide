@@ -49,7 +49,7 @@ fn traverse_frontier(frontier: &mut impl Frontier) -> Option<SearchNode> {
     let mut explored: Vec<SearchNode> = vec![];
 
     while let Some(current_node) = frontier.remove() {
-        debug_search_node(&current_node);
+        //debug_search_node(&current_node);
 
         if current_node.item().test_goal() {
             return Some(current_node.clone());

@@ -109,9 +109,7 @@ impl Eq for SearchNode {}
 
 impl PartialEq for SearchNode {
     fn eq(&self, other: &Self) -> bool {
-        self.depth == other.depth
-            && self.path_cost == other.path_cost
-            && self.item().hash_code() == other.item().hash_code()
+        self.item().hash_code() == other.item().hash_code()
     }
 }
 
