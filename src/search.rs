@@ -4,7 +4,7 @@ use std::rc::Rc;
 
 use crate::actions::Action; // TODO: how to abstract it away?? and have something in search.rs instead
 pub mod frontiers;
-pub mod uniform;
+pub mod uninformed;
 
 pub trait SearchProblem {
     fn actions(&self) -> Vec<Action>;

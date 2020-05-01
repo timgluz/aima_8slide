@@ -3,7 +3,7 @@ mod eight_puzzle;
 mod search;
 
 use eight_puzzle::{PuzzleStateRow, PUZZLE_SIZE};
-use search::uniform::*;
+use search::uninformed::*;
 
 enum SearchAlgorithm {
     DepthFirst,
@@ -48,7 +48,6 @@ Algorithms available:
 
 const DEFAULT_ALGORITHM: SearchAlgorithm = SearchAlgorithm::BreadthFirst;
 
-// TODO: read algo from CLI
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let command = args.get(1).expect(&USAGE);
@@ -69,7 +68,7 @@ fn puzzle_from_string(row_str: &String) -> PuzzleStateRow {
         .collect();
 
     if row.len() != PUZZLE_SIZE {
-        println!("Error: puzzle must have {} items.", PUZZLE_SIZE);
+        eprintln!("Error: puzzle must have {} items.", PUZZLE_SIZE);
         print_usage();
     };
 
