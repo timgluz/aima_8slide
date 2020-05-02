@@ -9,9 +9,10 @@ enum SearchAlgorithm {
     DepthFirst,
     BreadthFirst,
     UniformCost,
+    DepthLimited,
 }
 
-fn solve_eight_puzzle(test_row: [u8; 9], algorithm: SearchAlgorithm) {
+fn solve_eight_puzzle(test_row: [u8; 9], algorithm: SearchAlgorithm, max_depth: usize) {
     let initial_state = eight_puzzle::EightPuzzleState::new(test_row);
     if !initial_state.is_solveable() {
         println!("Unsolvable problem: {:?}", initial_state.value());
@@ -23,6 +24,7 @@ fn solve_eight_puzzle(test_row: [u8; 9], algorithm: SearchAlgorithm) {
         SearchAlgorithm::DepthFirst => depth_first_search(puzzle),
         SearchAlgorithm::BreadthFirst => breadth_first_search(puzzle),
         SearchAlgorithm::UniformCost => uniform_cost_search(puzzle),
+        SearchAlgorithm::DepthLimited => depth_limited_search(puzzle, max_depth),
     };
 
     match maybe_solution {
@@ -53,6 +55,7 @@ Algorithms available:
     depth_first - takes the last Action first, if tile can go to all 4 directions, then it would go right
     breadth_first - tries every action on the same level
     uniform_cost - takes cheapest (here shallowest) route first as route cost is constant
+    depth_limited - recursively does depth_first until max depth has reached
 ";
 
 const DEFAULT_ALGORITHM: SearchAlgorithm = SearchAlgorithm::BreadthFirst;
@@ -67,7 +70,7 @@ fn main() {
     let test_row = puzzle_from_string(command);
     let test_algo = algorithm_from_string(args.get(2).unwrap_or(&String::from("")));
 
-    solve_eight_puzzle(test_row, test_algo);
+    solve_eight_puzzle(test_row, test_algo, 10);
 }
 
 fn puzzle_from_string(row_str: &String) -> PuzzleStateRow {
@@ -94,6 +97,7 @@ fn algorithm_from_string(algo_str: &String) -> SearchAlgorithm {
         "depth_first" => SearchAlgorithm::DepthFirst,
         "breadth_first" => SearchAlgorithm::BreadthFirst,
         "uniform_cost" => SearchAlgorithm::UniformCost,
+        "depth_limited" => SearchAlgorithm::DepthLimited,
         _ => DEFAULT_ALGORITHM,
     }
 }

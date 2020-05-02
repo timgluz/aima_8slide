@@ -45,6 +45,34 @@ pub fn uniform_cost_search(problem: Box<dyn SearchProblem>) -> Option<SearchNode
     traverse_frontier(&mut frontier)
 }
 
+/// todo:
+///
+pub fn depth_limited_search(problem: Box<dyn SearchProblem>, limit: usize) -> Option<SearchNode> {
+    let root_node = SearchNode::root(problem);
+
+    recursive_dls(&root_node, limit)
+}
+
+fn recursive_dls(node: &SearchNode, limit: usize) -> Option<SearchNode> {
+    if node.item().test_goal() == true {
+        return Some(node.clone());
+    }
+
+    if limit == 0 {
+        return None;
+    }
+
+    for child in node.expand().iter() {
+        if let Some(res) = recursive_dls(&child, limit - 1) {
+            return Some(res);
+        }
+    }
+
+    None
+}
+
+// utils ----
+
 fn traverse_frontier(frontier: &mut impl Frontier) -> Option<SearchNode> {
     let mut explored: Vec<SearchNode> = vec![];
 
