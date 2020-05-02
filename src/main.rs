@@ -5,14 +5,18 @@ use eight_puzzle::{PuzzleStateRow, TileDirection, PUZZLE_SIZE};
 use search::uninformed::*;
 use search::{SearchNode, SearchProblem};
 
+#[derive(Clone, Debug)]
 enum SearchAlgorithm {
     DepthFirst,
     BreadthFirst,
     UniformCost,
     DepthLimited,
+    IterativeDeepening,
 }
 
 fn solve_eight_puzzle(test_row: [u8; 9], algorithm: SearchAlgorithm, max_depth: usize) {
+    println!("Going to use {:?}", algorithm);
+
     let initial_state = eight_puzzle::EightPuzzleState::new(test_row);
     if !initial_state.is_solveable() {
         println!("Unsolvable problem: {:?}", initial_state.value());
@@ -25,6 +29,7 @@ fn solve_eight_puzzle(test_row: [u8; 9], algorithm: SearchAlgorithm, max_depth: 
         SearchAlgorithm::BreadthFirst => breadth_first_search(puzzle),
         SearchAlgorithm::UniformCost => uniform_cost_search(puzzle),
         SearchAlgorithm::DepthLimited => depth_limited_search(puzzle, max_depth),
+        SearchAlgorithm::IterativeDeepening => iterative_deepening_search(puzzle),
     };
 
     match maybe_solution {
@@ -66,11 +71,11 @@ fn main() {
     if command == "-h" || command == "--help" {
         print_usage();
     }
-
+    let max_depth = 10; // TODO: use clap to move it behing CLI param with default value
     let test_row = puzzle_from_string(command);
     let test_algo = algorithm_from_string(args.get(2).unwrap_or(&String::from("")));
 
-    solve_eight_puzzle(test_row, test_algo, 10);
+    solve_eight_puzzle(test_row, test_algo, max_depth);
 }
 
 fn puzzle_from_string(row_str: &String) -> PuzzleStateRow {
@@ -98,6 +103,7 @@ fn algorithm_from_string(algo_str: &String) -> SearchAlgorithm {
         "breadth_first" => SearchAlgorithm::BreadthFirst,
         "uniform_cost" => SearchAlgorithm::UniformCost,
         "depth_limited" => SearchAlgorithm::DepthLimited,
+        "iterative_deepening" => SearchAlgorithm::IterativeDeepening,
         _ => DEFAULT_ALGORITHM,
     }
 }

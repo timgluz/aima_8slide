@@ -22,7 +22,7 @@ cargo run -- 1,2,3,4,5,0,7,8,6 uniform_cost
 * breadth_first - BreadthFirst search, goes level by level until reaches end-of- tree
 * uniform_cost - UniformCost search, takes lowest cost path first
 * depth_limited - Depth Limited search, goes only N nodes deep and then backtracks back
-
+* iterative_deepening - iterativaly deepens horizon of DFS
 
 ## Examples
 

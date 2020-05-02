@@ -45,8 +45,23 @@ pub fn uniform_cost_search(problem: Box<dyn SearchProblem>) -> Option<SearchNode
     traverse_frontier(&mut frontier)
 }
 
-/// todo:
-///
+/// Iterative deepening search is a general strategy often used in combination with DFS,
+/// that finds the best depth limit. It does this by gradually increasing the limit
+/// until the goal is found
+pub fn iterative_deepening_search(problem: Box<dyn SearchProblem>) -> Option<SearchNode> {
+    let root_node = SearchNode::root(problem);
+
+    for limit in 0..usize::MAX {
+        if let Some(res) = recursive_dls(&root_node, limit) {
+            return Some(res);
+        }
+    }
+
+    None
+}
+
+/// This algorithm works around DFS issue of infinite-path problem
+/// by cut-offing the search after reaching to the specified depth;
 pub fn depth_limited_search(problem: Box<dyn SearchProblem>, limit: usize) -> Option<SearchNode> {
     let root_node = SearchNode::root(problem);
 
