@@ -1,7 +1,7 @@
 # AIMA 8Slide Puzzle
 
 A small solver for 8Slide puzzle written in Rust;
-The search algorithms are adopted from the book "AI: Modern Approach 3rd edition";
+The search algorithms are adopted from the book "AI: Modern Approach 3rd edition"[link](http://aima.cs.berkeley.edu/)
 
 ## Usage:
 
@@ -18,9 +18,10 @@ cargo run -- 1,2,3,4,5,0,7,8,6 uniform_cost
 
 #### Uninformed Search
 
-* DepthFirst
-* BreadthFirst
-* UniformCost
+* depth_first -  DepthFirst search, follows path until leaf, then backtracks back
+* breadth_first - BreadthFirst search, goes level by level until reaches end-of- tree
+* uniform_cost - UniformCost search, takes lowest cost path first
+* depth_limited - Depth Limited search, goes only N nodes deep and then backtracks back
 
 
 ## Examples
