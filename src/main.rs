@@ -1,9 +1,9 @@
-mod actions;
 mod eight_puzzle;
 mod search;
 
-use eight_puzzle::{PuzzleStateRow, PUZZLE_SIZE};
+use eight_puzzle::{PuzzleStateRow, TileDirection, PUZZLE_SIZE};
 use search::uninformed::*;
+use search::{SearchNode, SearchProblem};
 
 enum SearchAlgorithm {
     DepthFirst,
@@ -27,12 +27,21 @@ fn solve_eight_puzzle(test_row: [u8; 9], algorithm: SearchAlgorithm) {
 
     match maybe_solution {
         None => println!("no solution for {:?}", test_row),
-        Some(node) => println!(
-            "Found solution after {:?} steps: {:?}",
-            node.depth(),
-            node.solution()
-        ),
+        Some(node) => print_solution(&node),
     };
+}
+
+fn print_solution(node: &SearchNode) {
+    println!("Found solution after {:?} steps. Path:", node.depth());
+
+    for action in node.solution().iter() {
+        let direction: TileDirection = action.into();
+        match direction {
+            TileDirection::None => print!("|-> "),
+            _ => print!("{:?}, ", direction),
+        }
+    }
+    println!("|");
 }
 
 const USAGE: &'static str = "
