@@ -86,6 +86,71 @@ fn recursive_dls(node: &SearchNode, limit: usize) -> Option<SearchNode> {
     None
 }
 
+/// BreadthFirst from both direction until searches meet
+/// source:
+/// http://planning.cs.uiuc.edu/node50.html
+pub fn bidirectional_search(
+    problem: Box<dyn SearchProblem>,
+    goal_problem: Box<dyn SearchProblem>,
+) -> Option<SearchNode> {
+    let start_node = SearchNode::root(problem);
+    let goal_node = SearchNode::root(goal_problem);
+
+    let mut front_frontier = QueueFrontier::new();
+    front_frontier.add(start_node);
+
+    let mut back_frontier = QueueFrontier::new();
+    back_frontier.add(goal_node);
+
+    let mut explored: Vec<SearchNode> = vec![];
+
+    while !front_frontier.is_empty() && !back_frontier.is_empty() {
+        // consume front_frontier
+        if !front_frontier.is_empty() {
+            if let Some(current_node) = front_frontier.remove() {
+                if current_node.is_goal() {
+                    return Some(current_node);
+                } else if back_frontier.contains(&current_node) {
+                    // TODO: link 2 paths together
+                    return Some(current_node.clone());
+                } else {
+                    let child_nodes = current_node.expand();
+                    explored.push(current_node);
+
+                    // fill frontier
+                    for child_node in child_nodes.into_iter() {
+                        if !explored.contains(&child_node) {
+                            front_frontier.add(child_node);
+                        }
+                    }
+                }
+            }
+        }
+
+        // consume back_frontier
+        if !back_frontier.is_empty() {
+            if let Some(current_node) = back_frontier.remove() {
+                if front_frontier.contains(&current_node) {
+                    // TODO: link 2 paths together
+                    return Some(current_node);
+                } else {
+                    let child_nodes = current_node.expand();
+                    explored.push(current_node);
+
+                    // fill frontier
+                    for child_node in child_nodes.into_iter() {
+                        if !explored.contains(&child_node) {
+                            back_frontier.add(child_node);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    None
+}
+
 // utils ----
 
 fn traverse_frontier(frontier: &mut impl Frontier) -> Option<SearchNode> {

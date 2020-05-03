@@ -78,12 +78,19 @@ impl SearchNode {
 
         next_nodes
     }
+
+    pub fn is_goal(&self) -> bool {
+        self.item().test_goal()
+    }
+
     pub fn item(&self) -> &Rc<Box<dyn SearchProblem>> {
         &self.item
     }
+
     pub fn action(&self) -> &Option<Action> {
         &self.action
     }
+
     pub fn depth(&self) -> usize {
         self.depth
     }

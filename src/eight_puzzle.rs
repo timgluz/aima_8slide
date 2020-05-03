@@ -121,6 +121,7 @@ impl Tile {
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct EightPuzzleState {
     value: PuzzleStateRow,
 }
@@ -202,6 +203,14 @@ impl EightPuzzle {
 
     pub fn state(&self) -> &EightPuzzleState {
         &self.state
+    }
+
+    // returns a problem from goal
+    pub fn reverse_problem(&self) -> Self {
+        EightPuzzle {
+            state: EightPuzzleState::new(DEFAULT_GOAL),
+            goal: self.state.clone(),
+        }
     }
 
     // returns the heuristic value for a given state.

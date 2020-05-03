@@ -12,6 +12,7 @@ enum SearchAlgorithm {
     UniformCost,
     DepthLimited,
     IterativeDeepening,
+    Bidirectional,
 }
 
 fn solve_eight_puzzle(test_row: [u8; 9], algorithm: SearchAlgorithm, max_depth: usize) {
@@ -30,6 +31,10 @@ fn solve_eight_puzzle(test_row: [u8; 9], algorithm: SearchAlgorithm, max_depth: 
         SearchAlgorithm::UniformCost => uniform_cost_search(puzzle),
         SearchAlgorithm::DepthLimited => depth_limited_search(puzzle, max_depth),
         SearchAlgorithm::IterativeDeepening => iterative_deepening_search(puzzle),
+        SearchAlgorithm::Bidirectional => {
+            let goal_problem = Box::new(puzzle.reverse_problem());
+            bidirectional_search(puzzle, goal_problem)
+        }
     };
 
     match maybe_solution {
