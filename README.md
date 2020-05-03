@@ -18,11 +18,46 @@ cargo run -- 1,2,3,4,5,0,7,8,6 uniform_cost
 
 #### Uninformed Search
 
-* depth_first -  DepthFirst search, follows path until leaf, then backtracks back
-* breadth_first - BreadthFirst search, goes level by level until reaches end-of- tree
-* uniform_cost - UniformCost search, takes lowest cost path first
-* depth_limited - Depth Limited search, goes only N nodes deep and then backtracks back
-* iterative_deepening - iterativaly deepens horizon of DFS
+*b* - branching factor
+*d* - depth of shallowest solution
+*m* - maximum depth
+*l* - search limit
+
+* **depth_first** -  DepthFirst search, follows path until leaf, then backtracks back
+  * Complete? No
+  * Time: O(b^m) 
+  * Space: O(bm)
+  * Optimal: No
+  
+* **breadth_first** - BreadthFirst search, goes level by level until reaches end-of- tree
+  * Complete? Yes, if branching factor *b* is complete
+  * Time: O(b^d)
+  * Space: O(b^d)
+  * Optimal? Yes, if step costs are all identical (yes, for 8slide)
+    
+* **uniform_cost** - UniformCost search, takes lowest cost path first
+  * Complete? Yes, if *b* is complete and step costs are positive
+  * Time: O(b^(1+C/e))
+  * Space: O(b^{1+C/e})
+  * Optimal: Yes, if *b*  is complete and step costs are positive
+  
+* **depth_limited** - Depth Limited search, goes only N nodes deep and then backtracks back
+  * Complete? No
+  * Time: O(b^l)
+  * Space: O(b*l)
+  * Optimal: No
+  
+* **iterative_deepening** - iterativaly deepens horizon of DFS
+  * Complete? Yes, if *b* is finite
+  * Time: O(b^d)
+  * Space: O(b*d)
+  * Optimal: Yes, if step costs are identical
+  
+* **bidirectional** - iteratively expands search horizon from beginning and goal until they meet
+  * Complete? Yes, if *b* is finite
+  * Time: O(b^{d/2})
+  * Space: O(b^{d/2})
+  * Optimal: Yes, if step costs are identical, both direction use breadth first search
 
 ## Examples
 
